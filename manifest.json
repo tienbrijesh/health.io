@@ -1,0 +1,21 @@
+{
+  "name": "Titan Health OS",
+  "short_name": "Titan",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0f0f",
+  "theme_color": "#0f0f0f",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192/3b82f6/ffffff?text=Titan",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://via.placeholder.com/512/3b82f6/ffffff?text=Titan",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
