@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Layout } from './components/Layout';
 import { Onboarding } from './components/Onboarding';
 import { Dashboard } from './components/Dashboard';
@@ -129,6 +130,7 @@ const App = () => {
             </p>
           </div>
         </div>
+        <SpeedInsights />
       </div>
     );
   }
@@ -138,6 +140,7 @@ const App = () => {
       return (
           <div className="h-screen bg-titan-black text-white max-w-md mx-auto overflow-hidden">
                {renderContent()}
+               <SpeedInsights />
           </div>
       )
   }
@@ -147,6 +150,7 @@ const App = () => {
     return (
         <div className="h-screen bg-titan-black text-titan-text max-w-md mx-auto shadow-2xl overflow-hidden relative">
              {renderContent()}
+             <SpeedInsights />
         </div>
     );
   }
@@ -155,6 +159,7 @@ const App = () => {
   return (
     <Layout currentView={currentView} setView={setCurrentView}>
       {renderContent()}
+      <SpeedInsights />
     </Layout>
   );
 };
