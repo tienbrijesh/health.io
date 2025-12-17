@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { SpeedInsights } from '@vercel/speed-insights/react';
+import React, { useState, useEffect, Component, ReactNode } from 'react';
 import { Layout } from './components/Layout';
 import { Onboarding } from './components/Onboarding';
 import { Dashboard } from './components/Dashboard';
@@ -7,9 +6,46 @@ import { Chat } from './components/Chat';
 import { CheckIn } from './components/CheckIn';
 import { Settings } from './components/Settings';
 import { UserProfile, View } from './types';
-import { ShieldAlert, Trophy, Settings as SettingsIcon, Lock, ChevronRight, Bell, AlertTriangle, CheckCircle } from 'lucide-react';
+import { ShieldAlert, Trophy, Settings as SettingsIcon, Lock, ChevronRight, Bell, AlertTriangle, CheckCircle, RefreshCcw } from 'lucide-react';
 
-const App = () => {
+// Error Boundary for Production Stability
+class ErrorBoundary extends Component<{children: ReactNode}, {hasError: boolean, error: Error | null}> {
+  constructor(props: {children: ReactNode}) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="h-screen bg-titan-black flex flex-col items-center justify-center p-8 text-center">
+          <div className="p-6 bg-titan-danger/10 rounded-full text-titan-danger mb-6 ring-2 ring-titan-danger/20">
+            <AlertTriangle size={48} />
+          </div>
+          <h1 className="text-2xl font-bold text-white mb-2">SYSTEM CRITICAL ERROR</h1>
+          <p className="text-titan-muted text-sm mb-8 leading-relaxed max-w-xs">
+            The Titan OS kernel encountered an unexpected fault. Neural link severed.
+            <br/><span className="text-[10px] mt-2 block opacity-50">{this.state.error?.message}</span>
+          </p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="px-8 py-4 bg-white text-black font-bold rounded-xl flex items-center gap-2 active:scale-95 transition-transform"
+          >
+            <RefreshCcw size={18} />
+            Reboot System
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+const AppContent = () => {
   const [currentView, setCurrentView] = useState<View>(View.ONBOARDING);
   const [user, setUser] = useState<UserProfile | null>(null);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
@@ -19,27 +55,23 @@ const App = () => {
     if (savedUser) {
       const parsedUser = JSON.parse(savedUser);
       setUser(parsedUser);
-      // If user exists but hasn't consented (legacy users or cleared cache), show disclaimer
       if (!parsedUser.hasConsented) {
         setShowDisclaimer(true);
       } else {
         setCurrentView(View.DASHBOARD);
       }
     } else {
-      // New user: show disclaimer before onboarding
       setShowDisclaimer(true);
     }
   }, []);
 
   const handleDisclaimerAccept = () => {
     if (user) {
-      // Existing user accepting new terms
       const updatedUser = { ...user, hasConsented: true };
       setUser(updatedUser);
       localStorage.setItem('titan_user', JSON.stringify(updatedUser));
       setShowDisclaimer(false);
     } else {
-      // New user accepting terms before onboarding
       setShowDisclaimer(false);
       setCurrentView(View.ONBOARDING);
     }
@@ -48,7 +80,7 @@ const App = () => {
   const handleOnboardingComplete = (profile: UserProfile) => {
     const userWithDefaults = {
       ...profile,
-      hasConsented: true, // Explicitly set true here as they passed the gate
+      hasConsented: true,
       notifications: {
         dailyCheckIn: false,
         morningBrief: true,
@@ -66,12 +98,8 @@ const App = () => {
   };
 
   const renderContent = () => {
-    // Safety check: if somehow we are deep in the app but no user (shouldn't happen due to logic above)
     if (!user && currentView !== View.ONBOARDING) return <Onboarding onComplete={handleOnboardingComplete} />;
-    
-    // Explicit Onboarding Route
     if (currentView === View.ONBOARDING) return <Onboarding onComplete={handleOnboardingComplete} />;
-
     if (!user) return <Onboarding onComplete={handleOnboardingComplete} />;
 
     switch (currentView) {
@@ -90,7 +118,6 @@ const App = () => {
     }
   };
 
-  // 1. Disclaimer Modal (Highest Priority)
   if (showDisclaimer) {
     return (
       <div className="h-screen bg-black flex items-center justify-center p-6 z-50 fixed inset-0">
@@ -99,24 +126,12 @@ const App = () => {
             <div className="p-4 bg-titan-warning/10 rounded-full text-titan-warning ring-1 ring-titan-warning/30">
               <AlertTriangle size={32} />
             </div>
-            
-            <h2 className="text-xl font-bold text-white uppercase tracking-wide">
-              Legal Disclaimer
-            </h2>
-            
+            <h2 className="text-xl font-bold text-white uppercase tracking-wide">Legal Disclaimer</h2>
             <div className="text-left bg-titan-black/50 p-4 rounded-xl text-xs text-gray-300 border border-titan-gray/50 space-y-3 leading-relaxed max-h-[40vh] overflow-y-auto">
-              <p>
-                <strong>Titan Health OS</strong> is an AI-powered lifestyle optimization tool. It is 
-                <span className="text-titan-danger font-bold"> NOT </span> a medical device and does not provide medical advice.
-              </p>
-              <p>
-                The workout routines, diet plans, and mental discipline strategies generated by this AI are for informational and educational purposes only.
-              </p>
-              <p>
-                <strong>Agreement:</strong> By clicking "I Understand", you acknowledge that you are using this app at your own risk. You agree to consult a physician before beginning any new exercise or nutrition program. You agree to hold Titan Health OS harmless from any liability.
-              </p>
+              <p><strong>Titan Health OS</strong> is an AI-powered lifestyle optimization tool. It is <span className="text-titan-danger font-bold">NOT</span> a medical device.</p>
+              <p>The workout routines and diet plans generated are for informational purposes only.</p>
+              <p><strong>Agreement:</strong> By clicking "I Understand", you acknowledge you are using this app at your own risk. Consult a physician before starting any program.</p>
             </div>
-
             <button 
               onClick={handleDisclaimerAccept}
               className="w-full py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition-colors active:scale-95 flex items-center justify-center gap-2"
@@ -124,54 +139,41 @@ const App = () => {
               <CheckCircle size={18} />
               I Understand & Agree
             </button>
-            
-            <p className="text-[10px] text-titan-muted">
-              v1.0.1 Public Release
-            </p>
+            <p className="text-[10px] text-titan-muted">v1.0.2 Deployment Ready</p>
           </div>
         </div>
-        <SpeedInsights />
       </div>
     );
   }
 
-  // 2. Onboarding View (No Layout)
   if (currentView === View.ONBOARDING) {
-      return (
-          <div className="h-screen bg-titan-black text-white max-w-md mx-auto overflow-hidden">
-               {renderContent()}
-               <SpeedInsights />
-          </div>
-      )
+      return <div className="h-screen bg-titan-black text-white max-w-md mx-auto overflow-hidden">{renderContent()}</div>;
   }
 
-  // 3. Settings View (No Layout - Fullscreen)
   if (currentView === View.SETTINGS) {
-    return (
-        <div className="h-screen bg-titan-black text-titan-text max-w-md mx-auto shadow-2xl overflow-hidden relative">
-             {renderContent()}
-             <SpeedInsights />
-        </div>
-    );
+    return <div className="h-screen bg-titan-black text-titan-text max-w-md mx-auto shadow-2xl overflow-hidden relative">{renderContent()}</div>;
   }
 
-  // 4. Main App Layout
   return (
     <Layout currentView={currentView} setView={setCurrentView}>
       {renderContent()}
-      <SpeedInsights />
     </Layout>
   );
 };
 
-// Profile View
+const App = () => (
+  <ErrorBoundary>
+    <AppContent />
+  </ErrorBoundary>
+);
+
 interface ProfileViewProps {
   user: UserProfile;
   setView: (view: View) => void;
 }
 
 const ProfileView = ({ user, setView }: ProfileViewProps) => (
-    <div className="p-4 space-y-8 pt-8">
+    <div className="p-4 space-y-8 pt-8 animate-fade-in">
         <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-gradient-to-br from-titan-accent to-purple-600 rounded-full flex items-center justify-center text-2xl font-bold text-white">
                 {(user.name || 'T').charAt(0).toUpperCase()}
@@ -187,50 +189,29 @@ const ProfileView = ({ user, setView }: ProfileViewProps) => (
                 <Trophy size={80} className="text-yellow-500" />
             </div>
             <h3 className="text-lg font-bold text-yellow-500 mb-2">Upgrade to Titan Pro</h3>
-            <p className="text-sm text-gray-300 mb-4">Unlock advanced specific diet plans, unlimited AI coaching, and community challenges.</p>
+            <p className="text-sm text-gray-300 mb-4">Unlock advanced specific diet plans and unlimited AI coaching.</p>
             <button className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 rounded-xl transition-colors">
                 Subscribe ₹199/mo
             </button>
         </div>
 
         <div className="space-y-3">
-            <button 
-                onClick={() => setView(View.SETTINGS)}
-                className="w-full p-4 bg-titan-dark rounded-xl flex items-center justify-between border border-titan-gray hover:bg-titan-gray/50 transition-colors group"
-            >
+            <button onClick={() => setView(View.SETTINGS)} className="w-full p-4 bg-titan-dark rounded-xl flex items-center justify-between border border-titan-gray hover:bg-titan-gray/50 transition-colors group">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-titan-gray rounded-lg group-hover:bg-titan-dark transition-colors">
-                         <Bell size={20} className="text-titan-text" />
-                    </div>
+                    <div className="p-2 bg-titan-gray rounded-lg group-hover:bg-titan-dark transition-colors"><Bell size={20} className="text-titan-text" /></div>
                     <span className="font-medium">Notification Settings</span>
                 </div>
                 <ChevronRight size={20} className="text-titan-muted" />
             </button>
-
-            <button className="w-full p-4 bg-titan-dark rounded-xl flex items-center justify-between border border-titan-gray opacity-50 cursor-not-allowed">
-                <div className="flex items-center gap-3">
-                    <div className="p-2 bg-titan-gray rounded-lg">
-                        <SettingsIcon size={20} className="text-titan-muted" />
-                    </div>
-                    <span>Integrations</span>
-                </div>
-                <Lock size={16} />
-            </button>
-            
              <button className="w-full p-4 bg-titan-dark rounded-xl flex items-center justify-between border border-titan-gray">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-titan-gray rounded-lg">
-                        <ShieldAlert size={20} className="text-titan-danger" />
-                    </div>
+                    <div className="p-2 bg-titan-gray rounded-lg"><ShieldAlert size={20} className="text-titan-danger" /></div>
                     <span>Emergency Mode</span>
                 </div>
                 <div className="w-8 h-4 bg-titan-gray rounded-full relative"></div>
             </button>
         </div>
-
-        <div className="text-center text-xs text-titan-muted pt-8">
-            Titan OS v1.0.1
-        </div>
+        <div className="text-center text-xs text-titan-muted pt-8">Titan OS v1.0.2</div>
     </div>
 );
 

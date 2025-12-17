@@ -22,7 +22,7 @@ export const Chat: React.FC<ChatProps> = ({ user }) => {
       setMessages([{
         id: 'error-init',
         role: 'model',
-        text: `**SYSTEM FAILURE**: API Configuration missing. Check API_KEY.`,
+        text: `**SYSTEM FAILURE**: API Configuration missing. Check system credentials.`,
         timestamp: Date.now()
       }]);
       return;
@@ -48,14 +48,50 @@ export const Chat: React.FC<ChatProps> = ({ user }) => {
   }, [messages]);
 
   const getErrorMessage = (error: any): string => {
-    const msg = error?.message || '';
-    if (msg.includes('429')) return "Traffic Limit Exceeded. Cooling down systems. Please wait 60s.";
-    if (msg.includes('503') || msg.includes('500')) return "Central Core maintenance. Brief standby required.";
-    if (msg.includes('SAFETY') || msg.includes('blocked')) return "Safety protocols engaged. Query rejected.";
-    if (msg.includes('fetch') || msg.includes('network') || msg.includes('Network')) return "Network uplinks offline. Check your internet connection.";
-    if (msg.includes('Empty response')) return "Signal received but empty. Please rephrase.";
-    if (msg.includes('Chat session')) return "Neural link unstable. Re-initializing...";
-    return "Unknown system failure. Maintain discipline and retry.";
+    const status = error?.status || error?.response?.status;
+    const msg = (error?.message || '').toUpperCase();
+
+    // 1. Rate Limiting (429)
+    if (status === 429 || msg.includes('429') || msg.includes('TOO MANY REQUESTS')) {
+      return "Neural processors are overloaded (Rate Limit). Please stand by for 60 seconds before your next transmission.";
+    }
+
+    // 2. Server Errors (500, 503, 504)
+    if (status >= 500 || msg.includes('500') || msg.includes('503') || msg.includes('SERVICE UNAVAILABLE')) {
+      return "The Central Intelligence Core is under maintenance or temporarily offline. Attempting to restore link... Please retry in a few moments.";
+    }
+
+    // 3. Safety Filters
+    if (msg.includes('SAFETY') || msg.includes('BLOCKED') || msg.includes('CANDIDATE')) {
+      return "Safety Protocol Violation: Your request was flagged and intercepted. Ensure your queries align with Titan guidelines (no medical diagnoses or prohibited content).";
+    }
+
+    // 4. API Key / Auth (401, 403)
+    if (status === 401 || status === 403 || msg.includes('401') || msg.includes('403') || msg.includes('API_KEY')) {
+      return "Authentication Failure: Your Titan Access Key is invalid or expired. Please verify your credentials in system environment.";
+    }
+
+    // 5. Network Issues
+    if (msg.includes('FETCH') || msg.includes('NETWORK') || msg.includes('INTERNET') || msg.includes('CONNECTION')) {
+      return "Uplink Severed: Unable to reach the Titan cloud. Verify your internet connection and try again.";
+    }
+
+    // 6. Quota Issues
+    if (msg.includes('QUOTA') || msg.includes('EXCEEDED')) {
+      return "Resource Depleted: Your daily AI quota has been exhausted. System reset will occur at midnight.";
+    }
+
+    // 7. Empty Responses
+    if (msg.includes('EMPTY RESPONSE')) {
+      return "Null Signal: The core processed your query but returned no data. Try rephrasing your request for better compatibility.";
+    }
+
+    // 8. Session Issues
+    if (msg.includes('SESSION') || msg.includes('INITIALIZED')) {
+      return "Neural Link Unstable: The current session has expired. Attempting automatic re-initialization... Please resend your last input.";
+    }
+
+    return "Critical System Fault: An unexpected error occurred. Maintain discipline and retry your transmission shortly.";
   };
 
   const handleSend = async () => {
@@ -95,8 +131,8 @@ export const Chat: React.FC<ChatProps> = ({ user }) => {
       
       setMessages(prev => [...prev, errorMsg]);
 
-      // Attempt self-correction if session is dead
-      if (error?.message?.includes('Chat session')) {
+      // Attempt self-correction if session might be dead
+      if (error?.message?.toUpperCase().includes('SESSION') || error?.message?.toUpperCase().includes('INITIALIZED')) {
         try { initChat(user); } catch(e) {}
       }
     } finally {

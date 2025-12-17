@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-title" content="Titan OS" />
     
     <link rel="manifest" href="/manifest.json" />
-    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/192/3b82f6/ffffff?text=Titan" />
 
     <title>Titan Health OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -83,7 +83,9 @@
     "react/": "https://esm.sh/react@^19.2.3/",
     "lucide-react": "https://esm.sh/lucide-react@^0.561.0",
     "@google/genai": "https://esm.sh/@google/genai@^1.33.0",
-    "react-markdown": "https://esm.sh/react-markdown@^10.1.0"
+    "react-markdown": "https://esm.sh/react-markdown@^10.1.0",
+    "vite": "https://esm.sh/vite@^7.3.0",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
   }
 }
 </script>
@@ -91,7 +93,7 @@
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js')
-        .then(reg => console.log('Service Worker: Registered (Scope: ' + reg.scope + ')'))
+        .then(reg => console.log('Service Worker: Registered'))
         .catch(err => console.log('Service Worker: Error: ' + err));
     });
   }
@@ -99,5 +101,6 @@
 </head>
   <body>
     <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
   </body>
 </html>
