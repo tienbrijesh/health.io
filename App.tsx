@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, ReactNode, Component } from 'react';
 import { Layout } from './components/Layout';
 import { Onboarding } from './components/Onboarding';
@@ -18,31 +17,23 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-// Error Boundary for Production Stability
-// Fix: Using React.Component explicitly ensures that the generic types for state and props are correctly inherited.
+// Fixed ErrorBoundary by explicitly using React.Component to ensure props are correctly inherited and recognized by TypeScript
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
-    super(props);
-    this.state = {
-      hasError: false,
-      error: null
-    };
-  }
+  public state: ErrorBoundaryState = {
+    hasError: false,
+    error: null
+  };
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+  public static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  public componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error("Titan OS Kernel Panic:", error, errorInfo);
   }
 
-  render() {
-    // Destructuring state and props from 'this' to handle errors related to missing property definitions
-    const { hasError, error } = this.state;
-    const { children } = this.props;
-
-    if (hasError) {
+  public render() {
+    if (this.state.hasError) {
       return (
         <div className="h-screen bg-titan-black flex flex-col items-center justify-center p-8 text-center">
           <div className="p-6 bg-titan-danger/10 rounded-full text-titan-danger mb-6 ring-2 ring-titan-danger/20">
@@ -51,7 +42,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
           <h1 className="text-2xl font-bold text-white mb-2">SYSTEM CRITICAL ERROR</h1>
           <p className="text-titan-muted text-sm mb-8 leading-relaxed max-w-xs">
             The Titan OS kernel encountered an unexpected fault. Neural link severed.
-            <br/><span className="text-[10px] mt-2 block opacity-50">{error?.message}</span>
+            <br/><span className="text-[10px] mt-2 block opacity-50">{this.state.error?.message}</span>
           </p>
           <button 
             onClick={() => window.location.reload()}
@@ -64,9 +55,62 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
       );
     }
 
-    return children;
+    // Accessing children from props which is now correctly recognized via React.Component inheritance
+    return this.props.children;
   }
 }
+
+interface ProfileViewProps {
+  user: UserProfile;
+  setView: (view: View) => void;
+}
+
+const ProfileView = ({ user, setView }: ProfileViewProps) => (
+  <div className="p-4 space-y-8 pt-8 animate-fade-in">
+    <div className="flex items-center gap-4">
+      <div className="w-16 h-16 bg-gradient-to-br from-titan-accent to-purple-600 rounded-full flex items-center justify-center text-2xl font-bold text-white">
+        {(user.name || 'T').charAt(0).toUpperCase()}
+      </div>
+      <div>
+        <h2 className="text-xl font-bold">{user.name || 'Titan User'}</h2>
+        <span className="text-xs bg-titan-gray px-2 py-1 rounded text-titan-muted">Free Plan</span>
+      </div>
+    </div>
+
+    <div className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-600/30 p-6 rounded-2xl relative overflow-hidden">
+      <div className="absolute top-0 right-0 p-4 opacity-20">
+        <Trophy size={80} className="text-yellow-500" />
+      </div>
+      <h3 className="text-lg font-bold text-yellow-500 mb-2">Upgrade to Titan Pro</h3>
+      <p className="text-sm text-gray-300 mb-4">Unlock advanced specific diet plans and unlimited AI coaching.</p>
+      <button className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 rounded-xl transition-colors">
+        Subscribe ₹199/mo
+      </button>
+    </div>
+
+    <div className="space-y-3">
+      <button onClick={() => setView(View.SETTINGS)} className="w-full p-4 bg-titan-dark rounded-xl flex items-center justify-between border border-titan-gray hover:bg-titan-gray/50 transition-colors group">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-titan-gray rounded-lg group-hover:bg-titan-dark transition-colors">
+            <Bell size={20} className="text-titan-text" />
+          </div>
+          <span className="font-medium">Notification Settings</span>
+        </div>
+        <ChevronRight size={20} className="text-titan-muted" />
+      </button>
+      <button className="w-full p-4 bg-titan-dark rounded-xl flex items-center justify-between border border-titan-gray">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-titan-gray rounded-lg">
+            <ShieldAlert size={20} className="text-titan-danger" />
+          </div>
+          <span>Emergency Mode</span>
+        </div>
+        <div className="w-8 h-4 bg-titan-gray rounded-full relative"></div>
+      </button>
+    </div>
+    <div className="text-center text-xs text-titan-muted pt-8">Titan OS v1.0.2</div>
+  </div>
+);
 
 const AppContent = () => {
   const [currentView, setCurrentView] = useState<View>(View.ONBOARDING);
@@ -170,7 +214,7 @@ const AppContent = () => {
   }
 
   if (currentView === View.ONBOARDING) {
-      return <div className="h-screen bg-titan-black text-white max-w-md mx-auto overflow-hidden">{renderContent()}</div>;
+    return <div className="h-screen bg-titan-black text-white max-w-md mx-auto overflow-hidden">{renderContent()}</div>;
   }
 
   if (currentView === View.SETTINGS) {
@@ -188,54 +232,6 @@ const App = () => (
   <ErrorBoundary>
     <AppContent />
   </ErrorBoundary>
-);
-
-interface ProfileViewProps {
-  user: UserProfile;
-  setView: (view: View) => void;
-}
-
-const ProfileView = ({ user, setView }: ProfileViewProps) => (
-    <div className="p-4 space-y-8 pt-8 animate-fade-in">
-        <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-titan-accent to-purple-600 rounded-full flex items-center justify-center text-2xl font-bold text-white">
-                {(user.name || 'T').charAt(0).toUpperCase()}
-            </div>
-            <div>
-                <h2 className="text-xl font-bold">{user.name || 'Titan User'}</h2>
-                <span className="text-xs bg-titan-gray px-2 py-1 rounded text-titan-muted">Free Plan</span>
-            </div>
-        </div>
-
-        <div className="bg-gradient-to-r from-yellow-600/20 to-orange-600/20 border border-yellow-600/30 p-6 rounded-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-20">
-                <Trophy size={80} className="text-yellow-500" />
-            </div>
-            <h3 className="text-lg font-bold text-yellow-500 mb-2">Upgrade to Titan Pro</h3>
-            <p className="text-sm text-gray-300 mb-4">Unlock advanced specific diet plans and unlimited AI coaching.</p>
-            <button className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 rounded-xl transition-colors">
-                Subscribe ₹199/mo
-            </button>
-        </div>
-
-        <div className="space-y-3">
-            <button onClick={() => setView(View.SETTINGS)} className="w-full p-4 bg-titan-dark rounded-xl flex items-center justify-between border border-titan-gray hover:bg-titan-gray/50 transition-colors group">
-                <div className="flex items-center gap-3">
-                    <div className="p-2 bg-titan-gray rounded-lg group-hover:bg-titan-dark transition-colors"><Bell size={20} className="text-titan-text" /></div>
-                    <span className="font-medium">Notification Settings</span>
-                </div>
-                <ChevronRight size={20} className="text-titan-muted" />
-            </button>
-             <button className="w-full p-4 bg-titan-dark rounded-xl flex items-center justify-between border border-titan-gray">
-                <div className="flex items-center gap-3">
-                    <div className="p-2 bg-titan-gray rounded-lg"><ShieldAlert size={20} className="text-titan-danger" /></div>
-                    <span>Emergency Mode</span>
-                </div>
-                <div className="w-8 h-4 bg-titan-gray rounded-full relative"></div>
-            </button>
-        </div>
-        <div className="text-center text-xs text-titan-muted pt-8">Titan OS v1.0.2</div>
-    </div>
 );
 
 export default App;

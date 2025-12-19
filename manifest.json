@@ -3,7 +3,7 @@
   "short_name": "Titan OS",
   "description": "An AI-driven Health Operating System for optimizing Body, Diet, Mind, and Discipline with personalized Indian meal plans and workout protocols.",
   "id": "com.titan.healthos.v1",
-  "start_url": ".",
+  "start_url": "/",
   "scope": "/",
   "lang": "en-US",
   "dir": "ltr",
@@ -22,14 +22,9 @@
     "lifestyle",
     "productivity"
   ],
-  "iarc_rating_id": "e58c174a-76bb-493b-930f-54471396199a",
+  "iarc_rating_id": "none",
   "prefer_related_applications": false,
   "related_applications": [],
-  "scope_extensions": [
-    {
-      "origin": "*.usercontent.goog"
-    }
-  ],
   "icons": [
     {
       "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlS4LpAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAABJQTFRFADmC/3+Z/z+C/0+C/2+C/6+C/6+C/88vVwAAAAZ0Uk5T//////8AD5U6AAAAb0lEQVR42uzBAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAL8GDAAbAAEB96S7AAAAAElFTkSuQmCC",
@@ -56,14 +51,14 @@
       "sizes": "1080x1920",
       "type": "image/jpeg",
       "form_factor": "narrow",
-      "label": "Titan OS Dashboard - Core System Readiness"
+      "label": "Titan OS Dashboard"
     },
     {
       "src": "https://images.unsplash.com/photo-1594882645126-14020914d58d?auto=format&fit=crop&q=80&w=1920&h=1080",
       "sizes": "1920x1080",
       "type": "image/jpeg",
       "form_factor": "wide",
-      "label": "Titan OS Intelligent Coaching - Protocol Analysis"
+      "label": "Titan OS Intelligence"
     }
   ]
 }
