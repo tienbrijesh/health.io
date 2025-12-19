@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 
 // Global shim for process.env to prevent "process is not defined" crashes in Vite/Vercel
-if (typeof window !== 'undefined' && !window.process) {
+if (typeof window !== 'undefined' && !(window as any).process) {
   // @ts-ignore
-  window.process = { env: {} };
+  (window as any).process = { env: {} };
 }
 
 const rootElement = document.getElementById('root');

@@ -1,5 +1,8 @@
 {
   "name": "health.io",
   "description": "A mobile-first AI Health Operating System focusing on Body, Diet (Indian), Mind, Discipline, and Accountability. Driven by Gemini 2.5.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
 }

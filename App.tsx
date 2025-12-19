@@ -1,4 +1,5 @@
-import React, { useState, useEffect, Component, ReactNode } from 'react';
+
+import React, { useState, useEffect, ReactNode, Component } from 'react';
 import { Layout } from './components/Layout';
 import { Onboarding } from './components/Onboarding';
 import { Dashboard } from './components/Dashboard';
@@ -8,19 +9,39 @@ import { Settings } from './components/Settings';
 import { UserProfile, View } from './types';
 import { ShieldAlert, Trophy, Settings as SettingsIcon, Lock, ChevronRight, Bell, AlertTriangle, CheckCircle, RefreshCcw } from 'lucide-react';
 
+interface ErrorBoundaryProps {
+  children?: ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
 // Error Boundary for Production Stability
-class ErrorBoundary extends Component<{children: ReactNode}, {hasError: boolean, error: Error | null}> {
-  constructor(props: {children: ReactNode}) {
+// Fixed the error: "Property 'props' does not exist on type 'ErrorBoundary'" by using standard inheritance and constructor.
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = {
+      hasError: false,
+      error: null
+    };
   }
 
-  static getDerivedStateFromError(error: Error) {
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
   }
 
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error("Titan OS Kernel Panic:", error, errorInfo);
+  }
+
   render() {
-    if (this.state.hasError) {
+    const { hasError, error } = this.state;
+    const { children } = this.props;
+
+    if (hasError) {
       return (
         <div className="h-screen bg-titan-black flex flex-col items-center justify-center p-8 text-center">
           <div className="p-6 bg-titan-danger/10 rounded-full text-titan-danger mb-6 ring-2 ring-titan-danger/20">
@@ -29,7 +50,7 @@ class ErrorBoundary extends Component<{children: ReactNode}, {hasError: boolean,
           <h1 className="text-2xl font-bold text-white mb-2">SYSTEM CRITICAL ERROR</h1>
           <p className="text-titan-muted text-sm mb-8 leading-relaxed max-w-xs">
             The Titan OS kernel encountered an unexpected fault. Neural link severed.
-            <br/><span className="text-[10px] mt-2 block opacity-50">{this.state.error?.message}</span>
+            <br/><span className="text-[10px] mt-2 block opacity-50">{error?.message}</span>
           </p>
           <button 
             onClick={() => window.location.reload()}
@@ -41,7 +62,8 @@ class ErrorBoundary extends Component<{children: ReactNode}, {hasError: boolean,
         </div>
       );
     }
-    return this.props.children;
+
+    return children;
   }
 }
 
