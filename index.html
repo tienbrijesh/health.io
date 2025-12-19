@@ -14,6 +14,12 @@
     <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlS4LpAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAABJQTFRFADmC/3+Z/z+C/0+C/2+C/6+C/6+C/88vVwAAAAZ0Uk5T//////8AD5U6AAAAb0lEQVR42uzBAQEAAACAkP6v7ggKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAL8GDAAbAAEB96S7AAAAAElFTkSuQmCC" />
 
     <title>Titan Health OS</title>
+    
+    <!-- Critical: Shim process.env before any modules load -->
+    <script>
+      window.process = { env: { API_KEY: "" } };
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -50,6 +56,8 @@
       }
       .no-scrollbar::-webkit-scrollbar { display: none; }
       .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+      .animate-fade-in { animation: fade-in 0.5s ease-out; }
     </style>
   <script type="importmap">
 {
@@ -69,27 +77,5 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          try {
-            const swUrl = new URL('sw.js', window.location.href).href;
-            navigator.serviceWorker.register(swUrl)
-              .then(reg => {
-                console.log('[Titan OS] Service Worker Registered');
-              })
-              .catch(err => {
-                if (err.message.includes('origin') || err.name === 'SecurityError') {
-                  console.warn('[Titan OS] Service Worker ignored: Origin mismatch or Sandbox restriction detected.');
-                } else {
-                  console.error('[Titan OS] SW Registration Failed:', err);
-                }
-              });
-          } catch (e) {
-            console.warn('[Titan OS] Service Worker initialization skipped:', e);
-          }
-        });
-      }
-    </script>
   </body>
 </html>

@@ -1,12 +1,13 @@
+
 import React, { useState, useEffect, ReactNode, Component } from 'react';
-import { Layout } from './components/Layout';
-import { Onboarding } from './components/Onboarding';
-import { Dashboard } from './components/Dashboard';
-import { Chat } from './components/Chat';
-import { CheckIn } from './components/CheckIn';
-import { Settings } from './components/Settings';
-import { UserProfile, View } from './types';
-import { ShieldAlert, Trophy, Settings as SettingsIcon, Lock, ChevronRight, Bell, AlertTriangle, CheckCircle, RefreshCcw } from 'lucide-react';
+import { Layout } from './components/Layout.tsx';
+import { Onboarding } from './components/Onboarding.tsx';
+import { Dashboard } from './components/Dashboard.tsx';
+import { Chat } from './components/Chat.tsx';
+import { CheckIn } from './components/CheckIn.tsx';
+import { Settings } from './components/Settings.tsx';
+import { UserProfile, View } from './types.ts';
+import { ShieldAlert, Trophy, Lock, ChevronRight, Bell, AlertTriangle, CheckCircle, RefreshCcw } from 'lucide-react';
 
 interface ErrorBoundaryProps {
   children?: ReactNode;
@@ -17,12 +18,16 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-// Fixed ErrorBoundary by explicitly using React.Component to ensure props are correctly inherited and recognized by TypeScript
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  public state: ErrorBoundaryState = {
-    hasError: false,
-    error: null
-  };
+// Fixed ErrorBoundary by extending the imported Component class and ensuring generic types are correctly applied.
+// Added a constructor to help TypeScript recognize the class as a React Component with valid props and state.
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: null
+    };
+  }
 
   public static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
@@ -55,7 +60,6 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
       );
     }
 
-    // Accessing children from props which is now correctly recognized via React.Component inheritance
     return this.props.children;
   }
 }

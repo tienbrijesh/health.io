@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { UserProfile, EngineStatus, EngineType } from '../types';
-import { EngineCard } from './EngineCard';
-import { INITIAL_ENGINES } from '../constants';
-import { generateDailyPlan } from '../services/geminiService';
+import { UserProfile, EngineStatus, EngineType } from '../types.ts';
+import { EngineCard } from './EngineCard.tsx';
+import { INITIAL_ENGINES } from '../constants.ts';
+import { generateDailyPlan } from '../services/geminiService.ts';
 import ReactMarkdown from 'react-markdown';
 import { RefreshCw, Zap, Save, Check } from 'lucide-react';
 
@@ -17,11 +17,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    // Initialize engines (in a real app, load from LocalStorage)
     const storedEngines = localStorage.getItem('titan_engines');
     
     if (storedEngines) {
-      // Data migration: Merge stored status with new Display Names from constants
       const parsedData = JSON.parse(storedEngines);
       const migratedEngines = parsedData.map((storedEngine: any) => {
         const config = INITIAL_ENGINES.find(e => e.type === storedEngine.type);
@@ -37,7 +35,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         type: e.type,
         displayName: e.displayName,
         description: e.description,
-        score: Math.floor(Math.random() * 40) + 50, // Mock scores
+        score: Math.floor(Math.random() * 40) + 50,
         streak: 0,
         dailyTask: e.defaultTask,
         isComplete: false,
@@ -57,7 +55,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
     const key = `titan_brief_${today}`;
     const storedBrief = localStorage.getItem(key);
     
-    // Use cache if not forcing refresh
     if (!force && storedBrief) {
         setDailyBrief(storedBrief);
         setLoadingBrief(false);
@@ -66,21 +63,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         setDailyBrief(brief);
         localStorage.setItem(key, brief);
         setLoadingBrief(false);
-        setSaved(false); // Reset save state on new generation
+        setSaved(false);
     }
   };
 
   const handleSave = () => {
-    // Copy to clipboard and re-save to local storage to be safe
     const today = new Date().toDateString();
     localStorage.setItem(`titan_brief_${today}`, dailyBrief);
     
     navigator.clipboard.writeText(dailyBrief).then(() => {
         setSaved(true);
         setTimeout(() => setSaved(false), 2000);
-    }).catch(err => {
-        console.error('Failed to copy text: ', err);
-        // Fallback visual feedback even if copy fails (e.g. mobile permissions)
+    }).catch(() => {
         setSaved(true);
         setTimeout(() => setSaved(false), 2000);
     });
@@ -113,7 +107,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         </div>
       </header>
 
-      {/* AI Daily Brief Card */}
       <div className="bg-gradient-to-br from-titan-gray to-titan-dark p-5 rounded-xl border border-titan-gray/50 shadow-lg relative overflow-hidden group">
         <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
             <Zap size={64} />
@@ -127,7 +120,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                 <button 
                     onClick={handleSave} 
                     className="text-titan-muted hover:text-white p-1 transition-colors"
-                    title="Save / Copy"
                 >
                     {saved ? <Check size={18} className="text-titan-success" /> : <Save size={18} />}
                 </button>
@@ -135,7 +127,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
                     onClick={() => loadBrief(true)} 
                     className="text-titan-muted hover:text-white p-1 transition-colors"
                     disabled={loadingBrief}
-                    title="Regenerate"
                 >
                     <RefreshCw size={18} className={loadingBrief ? 'animate-spin' : ''} />
                 </button>
@@ -156,7 +147,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         </div>
       </div>
 
-      {/* 5 Engine Grid */}
       <div className="space-y-3">
         <h3 className="text-xs font-bold uppercase tracking-widest text-titan-muted mb-2">System Engines</h3>
         {engines.map((engine) => (
@@ -168,7 +158,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         ))}
       </div>
       
-      {/* Spacer for bottom nav */}
       <div className="h-20"></div>
     </div>
   );
