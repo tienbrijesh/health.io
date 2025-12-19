@@ -19,8 +19,8 @@ interface ErrorBoundaryState {
 }
 
 // Error Boundary for Production Stability
-// Fixed the error: "Property 'props' does not exist on type 'ErrorBoundary'" by using standard inheritance and constructor.
-class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+// Fix: Using React.Component explicitly ensures that the generic types for state and props are correctly inherited.
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = {
@@ -38,6 +38,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   render() {
+    // Destructuring state and props from 'this' to handle errors related to missing property definitions
     const { hasError, error } = this.state;
     const { children } = this.props;
 

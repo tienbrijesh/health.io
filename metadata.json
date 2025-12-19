@@ -1,6 +1,6 @@
 {
-  "name": "health.io",
-  "description": "A mobile-first AI Health Operating System focusing on Body, Diet (Indian), Mind, Discipline, and Accountability. Driven by Gemini 2.5.",
+  "name": "Titan Health OS",
+  "description": "An AI-driven Health Operating System for optimizing Body, Diet, Mind, and Discipline with personalized Indian meal plans and workout protocols.",
   "requestFramePermissions": [
     "camera",
     "microphone"
