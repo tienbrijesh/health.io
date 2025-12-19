@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect, ReactNode, Component } from 'react';
-import { Layout } from './components/Layout.tsx';
-import { Onboarding } from './components/Onboarding.tsx';
-import { Dashboard } from './components/Dashboard.tsx';
-import { Chat } from './components/Chat.tsx';
-import { CheckIn } from './components/CheckIn.tsx';
-import { Settings } from './components/Settings.tsx';
-import { UserProfile, View } from './types.ts';
+import { Layout } from './components/Layout';
+import { Onboarding } from './components/Onboarding';
+import { Dashboard } from './components/Dashboard';
+import { Chat } from './components/Chat';
+import { CheckIn } from './components/CheckIn';
+import { Settings } from './components/Settings';
+import { UserProfile, View } from './types';
 import { ShieldAlert, Trophy, Lock, ChevronRight, Bell, AlertTriangle, CheckCircle, RefreshCcw } from 'lucide-react';
 
 interface ErrorBoundaryProps {
@@ -18,16 +18,14 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-// Fixed ErrorBoundary by extending the imported Component class and ensuring generic types are correctly applied.
-// Added a constructor to help TypeScript recognize the class as a React Component with valid props and state.
+// Fixed ErrorBoundary by using a property initializer for state and the named Component import
+// to ensure TypeScript correctly recognizes this class as a React component.
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
-    super(props);
-    this.state = {
-      hasError: false,
-      error: null
-    };
-  }
+  // Property initializer for state fixes the 'Property state does not exist' errors
+  state: ErrorBoundaryState = {
+    hasError: false,
+    error: null
+  };
 
   public static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
@@ -124,12 +122,17 @@ const AppContent = () => {
   useEffect(() => {
     const savedUser = localStorage.getItem('titan_user');
     if (savedUser) {
-      const parsedUser = JSON.parse(savedUser);
-      setUser(parsedUser);
-      if (!parsedUser.hasConsented) {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        setUser(parsedUser);
+        if (!parsedUser.hasConsented) {
+          setShowDisclaimer(true);
+        } else {
+          setCurrentView(View.DASHBOARD);
+        }
+      } catch (e) {
+        localStorage.removeItem('titan_user');
         setShowDisclaimer(true);
-      } else {
-        setCurrentView(View.DASHBOARD);
       }
     } else {
       setShowDisclaimer(true);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { EngineType, UserProfile } from '../types.ts';
+import { EngineType, UserProfile } from '../types';
 import { Check, Save, Zap, Flame, Award } from 'lucide-react';
 
 interface CheckInProps {

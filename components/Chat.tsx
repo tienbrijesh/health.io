@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { UserProfile, ChatMessage } from '../types.ts';
-import { sendMessageToGemini, initChat } from '../services/geminiService.ts';
+import { UserProfile, ChatMessage } from '../types';
+import { sendMessageToGemini, initChat } from '../services/geminiService';
 import { Send, User, Bot, Loader2, AlertCircle } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 

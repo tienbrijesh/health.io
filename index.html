@@ -15,9 +15,13 @@
 
     <title>Titan Health OS</title>
     
-    <!-- Critical: Shim process.env before any modules load -->
     <script>
-      window.process = { env: { API_KEY: "" } };
+      // More robust process shim
+      if (typeof window.process === 'undefined') {
+        window.process = { env: { API_KEY: "" } };
+      } else if (!window.process.env) {
+        window.process.env = { API_KEY: "" };
+      }
     </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -76,6 +80,6 @@
 </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
+    <script type="module" src="index.tsx"></script>
   </body>
 </html>

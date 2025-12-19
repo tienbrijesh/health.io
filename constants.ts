@@ -1,4 +1,4 @@
-import { EngineType } from './types.ts';
+import { EngineType } from './types';
 
 export const INITIAL_ENGINES = [
   {

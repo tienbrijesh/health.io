@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { UserProfile, EngineStatus, EngineType } from '../types.ts';
-import { EngineCard } from './EngineCard.tsx';
-import { INITIAL_ENGINES } from '../constants.ts';
-import { generateDailyPlan } from '../services/geminiService.ts';
+import { UserProfile, EngineStatus, EngineType } from '../types';
+import { EngineCard } from './EngineCard';
+import { INITIAL_ENGINES } from '../constants';
+import { generateDailyPlan } from '../services/geminiService';
 import ReactMarkdown from 'react-markdown';
 import { RefreshCw, Zap, Save, Check } from 'lucide-react';
 
